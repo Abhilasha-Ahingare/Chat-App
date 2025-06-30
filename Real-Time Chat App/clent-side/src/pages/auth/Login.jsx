@@ -31,10 +31,7 @@ const Login = () => {
       try {
         const response = await apiClient.post(
           SINGUP_ROUTE,
-          {
-            email,
-            password: Password,
-          },
+          { email, password: Password },
           {
             headers: { "Content-Type": "application/json" },
             withCredentials: true,
@@ -57,10 +54,7 @@ const Login = () => {
         return alert("Please fill all the fields");
       const response = await apiClient.post(
         LOGIN_ROUTE,
-        {
-          email,
-          password: Password,
-        },
+        { email, password: Password },
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
@@ -79,11 +73,54 @@ const Login = () => {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#052736] to-[#55758a] flex items-center justify-center px-4 py-12">
-      <div className="bg-white/5 rounded-3xl shadow-2xl w-full max-w-lg px-10 py-12 relative z-10 flex flex-col items-center gap-8" style={{padding:"15px"}}>
+      <div
+        className="bg-white/5 rounded-3xl shadow-2xl w-full max-w-lg px-10 py-12 relative z-10 flex flex-col items-center gap-8"
+        style={{ padding: "15px" }}
+      >
         {/* Logo and Heading */}
         <div className="flex flex-col items-center gap-2">
-          <div className="w-20 h-20 bg-gradient-to-r from-indigo-950 to-blue-400 rounded-full flex items-center justify-center shadow-lg mb-2">
-            <img src="/your-logo.svg" alt="Logo" className="w-12 h-12" />
+          <div
+            className="w-20 h-20 md:w-24 md:h-24"
+            style={{
+              background: "linear-gradient(135deg, #1a3a4d 60%, #55758a 100%)",
+              borderRadius: "9999px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 24px 0 #05273644",
+              marginBottom: "0.5rem",
+            }}
+          >
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ animation: "spin 3s linear infinite" }}
+            >
+              <defs>
+                <linearGradient id="gradient" x1="0" y1="0" x2="24" y2="24">
+                  <stop offset="0%" stopColor="#7f53ff" />
+                  <stop offset="100%" stopColor="#ff512f" />
+                </linearGradient>
+                <style>
+                  {`
+                    @keyframes spin {
+                      100% { transform: rotate(360deg); }
+                    }
+                  `}
+                </style>
+              </defs>
+              <path
+                d="M5 12c0-2.21 1.79-4 4-4 1.54 0 2.88.89 3.5 2.17C13.12 8.89 14.46 8 16 8c2.21 0 4 1.79 4 4s-1.79 4-4 4c-1.54 0-2.88-.89-3.5-2.17C11.88 15.11 10.54 16 9 16c-2.21 0-4-1.79-4-4z"
+                stroke="url(#gradient)"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
           <h2 className="text-3xl font-extrabold text-indigo-200 text-center">
             Welcome to ChatApp
@@ -93,75 +130,47 @@ const Login = () => {
           </p>
         </div>
 
+        {/* Tabs for Login/Signup */}
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="w-full flex justify-between transition-all duration-300  rounded-full p-1 mb-8">
+          <TabsList className="w-full flex justify-between rounded-full p-1 mb-8">
             <TabsTrigger
               value="login"
-              className="w-1/2 text-center text-indigo-50 font-semibold rounded-full py-2 transition-all data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:text-indigo-900"
+              className="w-1/2 text-center text-indigo-50 font-semibold rounded-full py-2 data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:text-indigo-900"
             >
               Sign In
             </TabsTrigger>
             <TabsTrigger
               value="signup"
-              className="w-1/2 text-center text-indigo-50 font-semibold rounded-full py-2 transition-all data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:text-indigo-900"
+              className="w-1/2 text-center text-indigo-50 font-semibold rounded-full py-2 data-[state=active]:bg-white data-[state=active]:shadow data-[state=active]:text-indigo-900"
             >
               Sign Up
             </TabsTrigger>
           </TabsList>
 
-          {/* Sign In Form */}
+          {/* Sign In */}
           <TabsContent
             value="login"
-            className="flex flex-col items-center gap-5 animate-fade-in"
+            className="flex flex-col items-center gap-5"
           >
             <div className="w-full flex flex-col gap-4">
-              {/* Email Input */}
-              <div className="flex gap-4 items-center bg-[#f0f4ff] border border-indigo-200 rounded-full h-[48px] w-full px-4" style={{padding:"15px"}}>
-                <span className="text-indigo-400 mr-2 flex-shrink-0">
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" />
-                    <path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4Z" />
-                  </svg>
-                </span>
-                <Input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none shadow-none text-indigo-400 text-base placeholder:text-indigo-400"
-                />
-              </div>
-              {/* Password Input */}
-              <div className="flex gap-3 items-center bg-[#f0f4ff] border border-indigo-200 rounded-full h-[48px] w-full px-4" style={{padding:"15px"}}>
-                <span className="text-indigo-400 mr-2 flex-shrink-0">
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect width="12" height="8" x="6" y="11" rx="4" />
-                    <path d="M12 15v2" />
-                    <path d="M8 11V7a4 4 0 1 1 8 0v4" />
-                  </svg>
-                </span>
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={Password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none shadow-none text-indigo-800 text-base placeholder:text-indigo-400"
-                />
-              </div>
+              <Input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="rounded-full bg-[#f0f4ff] border border-indigo-200 h-12 px-6 text-indigo-800 placeholder:text-indigo-400"
+                style={{ padding: "16px" }}
+
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={Password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-full bg-[#f0f4ff] border border-indigo-200 h-12 px-6 text-indigo-800 placeholder:text-indigo-400"
+                style={{ padding: "16px" }}
+
+              />
             </div>
             <div className="w-full flex justify-end">
               <a
@@ -173,93 +182,48 @@ const Login = () => {
             </div>
             <Button
               onClick={handleLogin}
-              className="w-full rounded-full bg-gradient-to-r from-indigo-950 to-blue-400 hover:from-indigo-500 hover:to-blue-900 py-3 text-white font-semibold shadow-md hover:shadow-lg mt-2 text-lg"
+              className="w-full rounded-full bg-gradient-to-r from-indigo-950 to-blue-400 hover:from-indigo-500 hover:to-blue-900 py-3 text-white font-semibold shadow-md hover:shadow-lg text-lg"
             >
               Sign In
             </Button>
           </TabsContent>
 
-          {/* Sign Up Form */}
+          {/* Sign Up */}
           <TabsContent
             value="signup"
-            className="flex flex-col items-center gap-5 animate-fade-in"
+            className="flex flex-col items-center gap-5"
           >
             <div className="w-full flex flex-col gap-4">
-              {/* Email Input */}
-              <div className="flex gap-3 items-center bg-[#f0f4ff] border border-indigo-200 rounded-full h-[48px] w-full px-4" style={{padding:"15px"}}>
-                <span className="text-indigo-400 mr-2 flex-shrink-0">
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" />
-                    <path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4Z" />
-                  </svg>
-                </span>
-                <Input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none shadow-none text-indigo-700 text-base placeholder:text-indigo-400"
-                />
-              </div>
-              {/* Password Input */}
-              <div className="flex gap-3 items-center bg-[#f0f4ff] border border-indigo-200 rounded-full h-[48px] w-full px-4" style={{padding:"15px"}}>
-                <span className="text-indigo-400 mr-2 flex-shrink-0">
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect width="12" height="8" x="6" y="11" rx="4" />
-                    <path d="M12 15v2" />
-                    <path d="M8 11V7a4 4 0 1 1 8 0v4" />
-                  </svg>
-                </span>
-                <Input
-                  type="password"
-                  placeholder="Create password"
-                  value={Password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none shadow-none text-indigo-700 text-base placeholder:text-indigo-400"
-                />
-              </div>
-              {/* Confirm Password Input */}
-              <div className="flex items-center bg-[#f0f4ff] border border-indigo-200 rounded-full h-[48px] gap-3 w-full px-4" style={{padding:"15px"}}>
-                <span className="text-indigo-400 mr-2 flex-shrink-0">
-                  <svg
-                    width="20"
-                    height="20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect width="12" height="8" x="6" y="11" rx="4" />
-                    <path d="M12 15v2" />
-                    <path d="M8 11V7a4 4 0 1 1 8 0v4" />
-                  </svg>
-                </span>
-                <Input
-                  type="password"
-                  placeholder="Confirm password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none shadow-none text-indigo-700 text-base placeholder:text-indigo-400"
-                />
-              </div>
+              <Input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="rounded-full bg-[#f0f4ff] border border-indigo-200 h-12 px-6 text-indigo-800 placeholder:text-indigo-400"
+                style={{ padding: "16px" }}
+              />
+              <Input
+                type="password"
+                placeholder="Create password"
+                value={Password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="rounded-full bg-[#f0f4ff] border border-indigo-200 h-12 px-6 text-indigo-800 placeholder:text-indigo-400"
+                style={{ padding: "16px" }}
+
+              />
+              <Input
+                type="password"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="rounded-full bg-[#f0f4ff] border border-indigo-200 h-12 px-6 text-indigo-800 placeholder:text-indigo-400"
+                style={{ padding: "16px" }}
+
+              />
             </div>
             <Button
               onClick={handleSigUp}
-              className="w-full rounded-full bg-gradient-to-r from-indigo-950 to-blue-400 hover:from-indigo-900 hover:to-blue-500 py-3 text-white font-semibold shadow-md hover:shadow-lg mt-2 text-lg"
+              className="w-full rounded-full bg-gradient-to-r from-indigo-950 to-blue-400 hover:from-indigo-900 hover:to-blue-500 py-3 text-white font-semibold shadow-md hover:shadow-lg text-lg"
             >
               Sign Up
             </Button>

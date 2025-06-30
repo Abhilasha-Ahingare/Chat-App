@@ -98,14 +98,6 @@ const CreateChannel = () => {
             />
           </div>
           <div>
-            {/* <MultipleSelector
-              className="rounded-lg bg-[#2c2e3b] border-none py-2 text-white"
-              defaultOptions={allContact}
-              placeholder="Search contacts"
-              value={selectedContacts}
-              onChange={setSelectedContacts}
-              emptyIndicator={<p className="text-center text-lg leading-10 text-gray-600">no results found</p>}
-            /> */}
             <MultipleSelector
               defaultOptions={allContact}
               placeholder="Select frameworks you like..."

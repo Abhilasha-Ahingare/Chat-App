@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
 import { FaTrash, FaPlus } from "react-icons/fa";
-
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { colors, getColor } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -18,60 +17,58 @@ import {
 const Profile = () => {
   const { userInfo, setUserInfo } = userStore();
   const navigate = useNavigate();
-  const [firstName, setfirstName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [image, setimage] = useState(null);
+  const [image, setImage] = useState("");
   const [hovered, setHovered] = useState(false);
   const [color, setColor] = useState(0);
   const fileInputRef = useRef(null);
 
-  if (!userInfo) {
-    return <div>Redirecting to login...</div>;
-  }
-
   useEffect(() => {
     if (userInfo) {
-      setfirstName(userInfo.firstName || "");
+      setFirstName(userInfo.firstName || "");
       setLastName(userInfo.lastName || "");
       setColor(userInfo.color || 0);
-      setimage(userInfo.image || "");
+      // 🔥 Fix image url so it shows on edit page
+      setImage(
+        userInfo.image ? `http://localhost:5000/${userInfo.image}` : ""
+      );
     }
   }, [userInfo]);
 
-  const saveChanges = async () => {
-    if (!firstName && !lastName)
-      return alert("fisrt name and last name are required");
-    try {
-      const formData = new FormData();
-      formData.append("firstName", firstName);
-      formData.append("lastName", lastName);
-      formData.append("color", color);
-      if (userInfo.image) {
-        setimage(userInfo.image);
-      }
+  if (!userInfo) {
+    return <div className="text-white text-lg p-10">Redirecting to login...</div>;
+  }
 
-      const response = await apiClient.put(UPDATE_PROFILE, formData, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+  const saveChanges = async () => {
+    if (!firstName || !lastName) {
+      return alert("First name and last name are required.");
+    }
+    try {
+      const response = await apiClient.put(
+        UPDATE_PROFILE,
+        { firstName, lastName, color },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+
       if (response.status === 200 && response.data) {
         setUserInfo({ ...response.data });
-        alert("profile update successfully");
+        alert("Profile updated successfully!");
+        navigate("/chats");
       }
-      navigate("/chats");
     } catch (error) {
-      console.log(error);
+      console.error("Profile update failed:", error);
+      alert("Failed to update profile.");
     }
-  };
-
-  const handleNavigate = () => {
-    if (userInfo.profileSetup) return navigate("/chats");
-    else return alert("please setup profile");
   };
 
   const handleInputClick = () => {
     fileInputRef.current.click();
   };
+
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -85,12 +82,13 @@ const Profile = () => {
 
         if (response.status === 200 && response.data.image) {
           const fullImageUrl = `http://localhost:5000/${response.data.image}`;
-          setimage(fullImageUrl);
-          alert("Image updated successfully");
+          setImage(fullImageUrl);
+          setUserInfo((prev) => ({ ...prev, image: response.data.image }));
+          alert("Profile image updated!");
         }
       } catch (error) {
         console.error("Image upload failed:", error);
-        alert("Something went wrong while uploading the image");
+        alert("Something went wrong while uploading the image.");
       }
     }
   };
@@ -102,10 +100,9 @@ const Profile = () => {
       });
 
       if (response.status === 200) {
-        // Clear image from state and userInfo
-        setUserInfo({ ...userInfo, image: null });
-        setimage(null);
-        alert("Profile image deleted successfully");
+        setImage("");
+        setUserInfo((prev) => ({ ...prev, image: null }));
+        alert("Profile image deleted!");
       }
     } catch (error) {
       console.log("Error deleting image:", error);
@@ -113,9 +110,14 @@ const Profile = () => {
     }
   };
 
+  const handleNavigate = () => {
+    if (userInfo?.profileSetup) navigate("/chats");
+    else alert("Please setup your profile first.");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#143644] to-[#1a1a24] flex items-center justify-center py-10">
-      <div className="flex flex-col gap-8 w-[90vw] md:w-[60vw] lg:w-[40vw] bg-white/5 backdrop-blur-lg rounded-2xl  shadow-2xl border border-white/10" style={{padding:"10px"}}>
+      <div className="flex flex-col gap-8 w-[90vw] md:w-[60vw] lg:w-[40vw] bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/10 p-6">
         <div onClick={handleNavigate} className="cursor-pointer">
           <IoArrowBack className="text-3xl text-white/80 hover:text-indigo-400 transition-all duration-300 transform hover:scale-110" />
         </div>
@@ -139,7 +141,9 @@ const Profile = () => {
                     color
                   )}`}
                 >
-                  {firstName ? firstName.charAt(0) : userInfo.email.charAt(0)}
+                  {firstName
+                    ? firstName.charAt(0)
+                    : userInfo.email.charAt(0)}
                 </div>
               )}
             </Avatar>
@@ -164,6 +168,7 @@ const Profile = () => {
               accept=".png, .jpg, .jpeg, .svg, .webp"
             />
           </div>
+
           <div className="flex flex-col gap-5 text-white items-center justify-center w-full">
             <Input
               type="email"
@@ -175,8 +180,8 @@ const Profile = () => {
             <Input
               type="text"
               placeholder="First Name"
-              onChange={(e) => setfirstName(e.target.value)}
               value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               className="rounded-xl bg-white/5 border border-white/10 text-white/90 text-center shadow-lg px-6 py-7 text-lg focus:border-indigo-500/30 transition-all duration-300 backdrop-blur-sm w-full max-w-xs md:max-w-sm"
             />
             <Input
@@ -201,9 +206,10 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
         <Button
-          className="h-16 w-full bg-gradient-to-r from-gray-900 to-gray-700 hover:from-gray-800 hover:to-gray-600 transition-all duration-300 text-white text-xl font-medium tracking-wide rounded-xl shadow-lg shadow-indigo-000/25 transform hover:scale-[1.02] border border-gray-800"
           onClick={saveChanges}
+          className="h-16 w-full bg-gradient-to-r from-gray-900 to-gray-700 hover:from-gray-800 hover:to-gray-600 transition-all duration-300 text-white text-xl font-medium tracking-wide rounded-xl shadow-lg transform hover:scale-[1.02] border border-gray-800"
         >
           Save Changes
         </Button>

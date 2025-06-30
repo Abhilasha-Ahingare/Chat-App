@@ -8,6 +8,8 @@ const chatsSlice = (set, get) => ({
   fileUploadProgress: 0,
   fileDownloadProgress: 0,
   channels: [],
+  showContacts: true,
+  setShowContacts: (showContacts) => set({ showContacts }),
 
   setChannels: (channels) => set({ channels }),
   setIsUploading: (isUploading) => set({ isUploading }),
@@ -30,6 +32,7 @@ const chatsSlice = (set, get) => ({
       selectedChatData: undefined,
       selectedChatType: undefined,
       selectedChatMessages: [],
+       showContacts: true,
     }),
   addMessage: (message) => {
     const selectedChatMessages = get().selectedChatMessages;

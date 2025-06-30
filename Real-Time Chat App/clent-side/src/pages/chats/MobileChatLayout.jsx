@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from "react";
 import ContactsContainer from "../contacts-contaier/ContactsContainer";
-import { userStore } from "@/store/store";
 import ChatsContsiner from "./chat-conrainer";
+import { userStore } from "@/store/store";
 
 const MobileChatLayout = () => {
-  const { selectedChatData } = userStore();
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 804);
+  const showContacts = userStore(state => state.showContacts);
+  const selectedChatData = userStore(state => state.selectedChatData);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth >= 500);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 804);
+    const handleResize = () => setIsMobile(window.innerWidth >= 500);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Show chat if a contact is selected, else show contacts (on mobile)
   if (isMobile) {
-    return selectedChatData ? <ChatsContsiner /> : <ContactsContainer />;
+    return showContacts ? <ContactsContainer /> : <ChatsContsiner />;
   }
-  // On desktop, show both as per your existing layout (or just chat area)
+
   return (
     <div className="flex w-full h-full">
-      <ContactsContainer/>
-      <ChatsContsiner/>
+      <ContactsContainer />
+      <ChatsContsiner />
     </div>
   );
 };

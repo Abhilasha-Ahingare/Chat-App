@@ -126,7 +126,7 @@ const NewDm = () => {
                             }`
                           : contacts.email}
                       </span>
-                      <span className="text-xs text-[#7c3aed]">
+                      <span className="text-xs text-[#7589ad]">
                         {contacts.email}
                       </span>
                     </div>

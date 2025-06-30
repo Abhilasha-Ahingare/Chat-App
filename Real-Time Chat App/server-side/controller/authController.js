@@ -58,20 +58,22 @@ const loginUp = async (req, res) => {
     if (!email || !password) {
       return res
         .status(400)
-        .json({ message: "email and password is required.." });
+        .json({ message: "Email and password are required." });
     }
 
-    // Check if user already exists (optional but important)
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
+    // Compare password
     const auth = await compare(password, user.password);
     if (!auth) {
-      return res.status(404).json({ message: "password is incorrect" });
+      return res.status(400).json({ message: "Password is incorrect." });
     }
 
+    // Set JWT cookie
     res.cookie("jwt", createToken(email, user._id), {
       httpOnly: true,
       maxAge: cookieMaxAge,
@@ -79,24 +81,24 @@ const loginUp = async (req, res) => {
       sameSite: "Lax",
     });
 
-    return res.status(201).json({
+    // Send saved data directly
+    return res.status(200).json({
       user: {
         id: user._id,
         email: user.email,
         profileSetup: user.profileSetup,
-        fisrtName: user.firstName,
+        firstName: user.firstName,
         lastName: user.lastName,
         image: user.image,
         color: user.color,
-        profileSetup:
-          user.firstName && user.lastName && user.color !== undefined,
       },
     });
   } catch (error) {
-    console.error("Signup error:", error);
-    return res.status(500).json({ message: "server error" });
+    console.error("Login error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 const userInfo = async (req, res) => {
   try {
@@ -124,31 +126,29 @@ const updateProfile = async (req, res) => {
     const userId = req.userId;
     const { firstName, lastName, color } = req.body;
 
-    // ✅ Validation
+    // Validate inputs
     if (!firstName || !lastName || color === undefined) {
-      return res
-        .status(400)
-        .json({ message: "First name, last name, and color are required" });
+      return res.status(400).json({ 
+        message: "First name, last name, and color are required."
+      });
     }
 
-    // ✅ Update user
+    // Update user in DB
     const user = await User.findByIdAndUpdate(
       userId,
       {
         firstName,
         lastName,
         color,
-        profileSetup: true,
+        profileSetup: true, // mark as setup complete
       },
       { new: true, runValidators: true }
     );
 
-    // ✅ Check if user exists
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found." });
     }
 
-    // ✅ Send updated data
     return res.status(200).json({
       id: user._id,
       email: user.email,
@@ -164,64 +164,89 @@ const updateProfile = async (req, res) => {
   }
 };
 
+
 const profileImage = async (req, res) => {
   try {
     const userId = req.userId;
 
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      return res.status(400).json({ message: "No file uploaded." });
     }
 
-    // Get file extension and create new file name
+    // Get file extension & create new file name
     const ext = path.extname(req.file.originalname);
-    const newFileName = Date.now() + ext;
+    const newFileName = `${Date.now()}${ext}`;
     const newPath = path.join("uploads/profiles", newFileName);
 
-    // Rename the file
+    // Rename (move) file
     await fs.rename(req.file.path, newPath);
 
-    // Store the relative path in the database
+    // Store relative path in DB
     const imagePath = `uploads/profiles/${newFileName}`;
 
-    // Update user document with the new image path
+    // Update user with new image
     const user = await User.findByIdAndUpdate(
       userId,
       { image: imagePath },
       { new: true, runValidators: true }
     );
 
-    // Send the relative path in the response
-    return res.status(200).json({ image: imagePath });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.status(200).json({
+      id: user._id,
+      email: user.email,
+      profileSetup: user.profileSetup,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      image: user.image,
+      color: user.color,
+      message: "Profile image updated successfully."
+    });
   } catch (error) {
     console.error("Profile image upload error:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
+
 const removeProfileImage = async (req, res) => {
   try {
-    const user = await User.findById(req.userId);
+    const userId = req.userId;
+    const user = await User.findById(userId);
 
     if (!user || !user.image) {
-      return res.status(404).json({ message: "Image not found" });
+      return res.status(404).json({ message: "Profile image not found." });
     }
 
-    // Construct the absolute path using the relative path stored in the database
-    const imagePath = path.join(__dirname, "..", user.image); // The 'user.image' is the relative path
+    // Absolute file path
+    const imagePath = path.join(__dirname, "..", user.image);
 
-    // Delete file from disk
+    // Delete image file
     await fs.unlink(imagePath);
 
-    // Remove image reference from the user's profile
+    // Remove reference from DB
     user.image = undefined;
     await user.save();
 
-    return res.status(200).json({ message: "Image removed successfully" });
+    return res.status(200).json({
+      id: user._id,
+      email: user.email,
+      profileSetup: user.profileSetup,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      image: user.image,
+      color: user.color,
+      message: "Profile image removed successfully."
+    });
   } catch (error) {
     console.error("Remove profile image error:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 const LogOut = async (req, res) => {
   try {

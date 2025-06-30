@@ -11,7 +11,7 @@ const EmptyContainer = () => {
         <h3 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-wide">
           Welcome to{" "}
           <span className="font-medium bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">
-            Syncronus
+           BuddyTalk
           </span>
         </h3>
         <p className="text-gray-400 text-lg md:text-xl">
