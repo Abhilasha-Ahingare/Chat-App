@@ -4,8 +4,8 @@ import ChatsContsiner from "./chat-conrainer";
 import { userStore } from "@/store/store";
 
 const MobileChatLayout = () => {
-  const showContacts = userStore(state => state.showContacts);
-  const selectedChatData = userStore(state => state.selectedChatData);
+  const showContacts = userStore((state) => state.showContacts);
+  const selectedChatData = userStore((state) => state.selectedChatData);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth >= 500);
 
   useEffect(() => {
